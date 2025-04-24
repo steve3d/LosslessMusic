@@ -41,7 +41,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let largerFont = NSFont.systemFont(ofSize: NSFont.menuFont(ofSize: 0).pointSize + 10)
         
-        let sampleRate = "\(Int(rate / 1000)) kHz"
+        let sampleRate = "\(String(format: "%.1f", rate / 1000)) kHz"
         
         sampleRateItem.attributedTitle = NSAttributedString(string: sampleRate, attributes: [
             .font: largerFont,
