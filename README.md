@@ -14,8 +14,6 @@ The opposite happens, when the next track happens to have a lower sample rate.
 Note, some DAC on MacOS 15.4(Sequoa) might missing the 16-bits depths, so for those musics, there is no bit-perfect playback.
 
 ## Installation
-Simply go to the Releases page of this repository or via [link to latest release](https://github.com/vincentneo/LosslessMusic/releases/latest)
-
 Drag the app to your Applications folder. If you wish to have it running when logging in, you should be able to add LosslessMusic in System Settings:
 
 ```
