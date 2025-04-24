@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="550" alt="header image with app icon" src="./LosslessMusic/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x-512.png">
+  <img width="256" alt="header image with app icon" src="./LosslessMusic/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x-512.png">
 
 </p>
 
@@ -64,4 +64,4 @@ By using LosslessMusic, you agree that under no circumstances will the developer
 LosslessMusic is licensed under GPL-3.0.
 
 ## Credits
-This project is inspired by [vincentneo/LosslessMusic](https://github.com/vincentneo/LosslessMusic), Which uses AppleScript to monitor the Apple Music's logs, but I don't use AppleScript, just use `log watch`, I think this is much efficient way to monitor the sample rates and bit depth. Again, Thank you Vincent Neo!
+This project is inspired by [vincentneo/LosslessSwitcher](https://github.com/vincentneo/LosslessSwitcher), Which uses AppleScript to monitor the Apple Music's logs, but I don't use AppleScript, just use `log watch`, I think this is much efficient way to monitor the sample rates and bit depth. Again, Thank you Vincent Neo!
