@@ -5,21 +5,21 @@
 
 #  
 
-LosslessSwitcher switches your current audio device's sample rate to match the currently playing lossless song on your Apple Music app, automatically.
+LosslessMusic switches your current audio device's sample rate to match the currently playing lossless song on your Apple Music app, automatically.
 
-Let's say if the next song that you are playing, is a Hi-Res Lossless track with a sample rate of 192kHz, LosslessSwitcher will switch your device to that sample rate as soon as possible. 
+Let's say if the next song that you are playing, is a Hi-Res Lossless track with a sample rate of 192kHz, LosslessMusic will switch your device to that sample rate as soon as possible. 
 
 The opposite happens, when the next track happens to have a lower sample rate. 
 
 Note, some DAC on MacOS 15.4(Sequoa) might missing the 16-bits depths, so for those musics, there is no bit-perfect playback.
 
 ## Installation
-Simply go to the Releases page of this repository or via [link to latest release](https://github.com/vincentneo/LosslessSwitcher/releases/latest)
+Simply go to the Releases page of this repository or via [link to latest release](https://github.com/vincentneo/LosslessMusic/releases/latest)
 
-Drag the app to your Applications folder. If you wish to have it running when logging in, you should be able to add LosslessSwitcher in System Settings:
+Drag the app to your Applications folder. If you wish to have it running when logging in, you should be able to add LosslessMusic in System Settings:
 
 ```
-> User & Groups > Login Items > Add LosslessSwitcher app
+> User & Groups > Login Items > Add LosslessMusic app
 ```
 
 ## App details
@@ -52,16 +52,16 @@ I think this improvement might be well appreciated by many, hence this project i
 ## Prerequisites
 Due to how the app works, this app is not, and cannot be sandboxed.
 It also has the following requirement, due to the use of `OSLog` API: 
-- The user running LosslessSwitcher must be an **admin**. This is not tested and assumed due to this [Apple Developer Forums thread](https://developer.apple.com/forums/thread/677068).
+- The user running LosslessMusic must be an **admin**. This is not tested and assumed due to this [Apple Developer Forums thread](https://developer.apple.com/forums/thread/677068).
 - Apple Music app must have Lossless mode on. (well, of course)
 
 Other than that, it should run on any Mac running macOS 11.4 or later.
 
 ## Disclaimer
-By using LosslessSwitcher, you agree that under no circumstances will the developer or any contributors be held responsible or liable in any way for any claims, damages, losses, expenses, costs or liabilities whatsoever or any other consequences suffered by you or incurred by you directly or indirectly in connection with any form of usages of LosslessSwitcher.
+By using LosslessMusic, you agree that under no circumstances will the developer or any contributors be held responsible or liable in any way for any claims, damages, losses, expenses, costs or liabilities whatsoever or any other consequences suffered by you or incurred by you directly or indirectly in connection with any form of usages of LosslessMusic.
 
 ## License
-LosslessSwitcher is licensed under GPL-3.0.
+LosslessMusic is licensed under GPL-3.0.
 
 ## Credits
-This project is inspired by [vincentneo/LosslessSwitcher](https://github.com/vincentneo/LosslessSwitcher), Which uses AppleScript to monitor the Apple Music's logs, but I don't use AppleScript, just use `log watch`, I think this is much efficient way to monitor the sample rates and bit depth. Again, Thank you Vincent Neo!
+This project is inspired by [vincentneo/LosslessMusic](https://github.com/vincentneo/LosslessMusic), Which uses AppleScript to monitor the Apple Music's logs, but I don't use AppleScript, just use `log watch`, I think this is much efficient way to monitor the sample rates and bit depth. Again, Thank you Vincent Neo!
