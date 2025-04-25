@@ -5,6 +5,7 @@
 //  Created by Steve Yin on 2025/4/24.
 //
 
+import AppKit
 import OSLog
 import CoreAudio
 
@@ -30,12 +31,24 @@ class LogMonitor {
     var newFormatDetected: ((UInt32, UInt32, Double, String) -> Void)?
 
     init() {
+        // After system wake up, log stream might be dead, so restart it
+        let workspace = NSWorkspace.shared
+        
+        workspace.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            print("System woke up, restart monitoring.")
+            self?.restartMonitoring()
+        }
+        
         startMonitoring()
     }
 
     deinit {
         // Terminate the process when the monitor is deallocated
-        process?.terminate()
+        stopMonitoring()
     }
 
     func startMonitoring() {
@@ -62,6 +75,9 @@ class LogMonitor {
                 logMessage.split(separator: "\n").forEach { self?.processLogLine($0) }
             }
         }
+        
+        // automatically restart process if it's dead
+        process?.terminationHandler = { [weak self] process in self?.restartMonitoring()}
 
         // Launch the process
         do {
@@ -69,6 +85,19 @@ class LogMonitor {
         } catch {
             print("Failed to launch log stream process: \(error)")
         }
+    }
+    
+    func stopMonitoring() {
+        // Reset the termination handler so it will not automatically restart when being terminated
+        if process?.isRunning == true {
+            process?.terminationHandler = nil
+            process?.terminate()
+        }
+    }
+    
+    func restartMonitoring() {
+        stopMonitoring()
+        startMonitoring()
     }
     
     private func processLogLine(_ line: String.SubSequence) {
