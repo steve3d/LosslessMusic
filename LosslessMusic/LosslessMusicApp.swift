@@ -27,9 +27,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let sampleRateMenuItem = NSMenuItem()
     let selectedDeviceMenuItem = NSMenuItem()
     
-    func setSelectedDeviceName(name: String) {
-        // NSTextField need and it's attributedString can only be create/set on main thread
-        // So I don't know how to use NSTextField to make the string perfectly centered horizontally
+    func setSelectedDeviceName(_ name: String) {
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 180, height: 30))
+        field.isEditable = false
+        field.isBezeled = false
+        field.drawsBackground = false
+        field.textColor = NSColor.gray
+        
         let attributedString = NSMutableAttributedString(string: name)
         let fullRange = NSRange(location: 0, length: name.count)
         let centeredParagraphStyle = NSMutableParagraphStyle()
@@ -37,24 +41,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         attributedString.addAttribute(.paragraphStyle, value: centeredParagraphStyle, range: fullRange)
         
         // offset 20, is it a dirty hack
-        attributedString.addAttribute(.baselineOffset, value: 20, range: fullRange)
+        attributedString.addAttribute(.baselineOffset, value: NSFont.menuFont(ofSize: 0).pointSize, range: fullRange)
+        field.attributedStringValue = attributedString
                         
-        selectedDeviceMenuItem.attributedTitle = attributedString
+        selectedDeviceMenuItem.view = field
         selectedDeviceMenuItem.isEnabled = false
+
     }
     
     func setSampleRate(_ rate: Double, _ bit: UInt32) {
-        // same as setSelectedDeviceName
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 180, height: 50))
+        field.isEditable = false
+        field.isBezeled = false 
+        field.drawsBackground = false
+        field.textColor = NSColor.selectedMenuItemTextColor
+        
         let sampleRate = "\(String(format: "%.1f", rate / 1000)) kHz"
         let fullText = "\(sampleRate)  \(bit)bits"
         let attributedString = NSMutableAttributedString(string: fullText)
         let fullRange = NSRange(location: 0, length: fullText.count)
+        let menuFont = NSFont.menuFont(ofSize: 0)
 
+        attributedString.addAttribute(.font, value: menuFont, range: fullRange)
         
-        let defaultFont = NSFont.menuFont(ofSize: NSFont.systemFontSize)
-        attributedString.addAttribute(.font, value: defaultFont, range: fullRange)
-        
-        let largeFont = NSFont.menuFont(ofSize: 20)
+        let largeFont = NSFont.menuFont(ofSize: menuFont.pointSize + 8)
         if let range = fullText.range(of: sampleRate) {
             let sampleRateRange = NSRange(range, in: fullText)
             attributedString.addAttribute(.font, value: largeFont, range: sampleRateRange)
@@ -65,10 +75,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         attributedString.addAttribute(.paragraphStyle, value: centeredParagraphStyle, range: fullRange)
         
         // is offset -20 a dirty hack?
-        attributedString.addAttribute(.baselineOffset, value: -20.0, range: fullRange)
+        attributedString.addAttribute(.baselineOffset, value: -largeFont.pointSize, range: fullRange)
         
+        field.attributedStringValue = attributedString
         
-        sampleRateMenuItem.attributedTitle = attributedString
+        sampleRateMenuItem.view = field
         sampleRateMenuItem.isEnabled = false
     }
 
@@ -114,13 +125,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let deviceID = sender.representedObject as? AudioDeviceID, let devices = outputDevices {
             
             devices.defaultDeviceId = deviceID
+            setSelectedDeviceName(sender.title)
             
             if let submenu = sender.menu {
                 for item in submenu.items {
                     item.state = (item.representedObject as? AudioDeviceID == deviceID) ? .on : .off
-                    if(devices.defaultDeviceId == deviceID) {
-                        setSelectedDeviceName(name: item.title)
-                    }
                 }
             }
         }
@@ -143,7 +152,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(menuItem)
             
             if(outputDevices?.defaultDeviceId == deviceInfo.deviceId) {
-                setSelectedDeviceName(name: deviceInfo.name)
+                setSelectedDeviceName(deviceInfo.name)
             }
         }
         

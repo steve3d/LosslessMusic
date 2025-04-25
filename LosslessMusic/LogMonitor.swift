@@ -58,8 +58,10 @@ class LogMonitor {
         var sampleRate: Double?
         var numChannels: UInt32?
         var asbdFormatId: String?
+        
 
         // Handle log output
+        // FIXME: after sleep, this might be dead
         pipe?.fileHandleForReading.readabilityHandler = { [weak self] handle in
             let data = handle.availableData
             if let logMessage = String(data: data, encoding: .utf8), !logMessage.isEmpty {
@@ -91,7 +93,11 @@ class LogMonitor {
                         
                         if let bitDepth, let sampleRate, let numChannels, let asbdFormatId {
                             print("New playing media format (\(asbdFormatId)) : nbChannels: \(numChannels), bitDepth: \(bitDepth), sampleRate: \(sampleRate * 1000)")
-                            self?.newFormatDetected?(numChannels, bitDepth, sampleRate * 1000, asbdFormatId)
+                            
+                            // must run on main thread
+                            DispatchQueue.main.async {
+                                self?.newFormatDetected?(numChannels, bitDepth, sampleRate * 1000, asbdFormatId)
+                            }
                         }
                     }
                     
