@@ -12,6 +12,7 @@ class LogMonitor {
     private var process: Process?
     private var pipe: Pipe?
     private var defaultDeviceId: AudioDeviceID = 0
+
     
     // Callback for media start to play, use call back for extreme simple solution
     // 1. nbChannels
@@ -43,18 +44,20 @@ class LogMonitor {
             "compact" // Use compact style for simpler parsing
         ]
         process?.standardOutput = pipe // only need standard output
+               
+        // media format info for lossless only
+        let mediaFormatPattern = /play\> cm\>> mediaFormatinfo.*lossless,/
         
-//        do {
-//            sdBitDepthPattern = try NSRegularExpression(pattern: #"sdBitDepth\s*=\s*(\d+)"#, options: [])
-//            asbdSampleRatePattern = try NSRegularExpression(pattern: #"asbdSampleRate\s*=\s*(\d+(?:\.\d+)?)"#, options: [])
-//        } catch {
-//            print("Invalid regex: \(error.localizedDescription)")
-//        }
+        let bitDepthPattern = /sdBitDepth = (\d+)/
+        let sampleRatePattern = /asbdSampleRate = (\d+(?:\.\d+)?)/
+        let formatIdPattern = /asbdFormatID = (\w+)/
+        let numChannelsPattern = /asbdNumChannels = (\d+)/
         
-        var newBitDepth: UInt32?
-        var newSampleRate: Double?
-        var newChannels: UInt32?
-        var newFormatId: String?
+        
+        var bitDepth: UInt32?
+        var sampleRate: Double?
+        var numChannels: UInt32?
+        var asbdFormatId: String?
 
         // Handle log output
         pipe?.fileHandleForReading.readabilityHandler = { [weak self] handle in
@@ -63,26 +66,32 @@ class LogMonitor {
                 // Process each log line
                 let lines = logMessage.split(separator: "\n")
                 for line in lines {
-                    if line.contains("play> cm>> mediaFormatinfo") {
-                        newBitDepth = nil
-                        newSampleRate = nil
-                        newChannels = nil
-                        newFormatId = nil
-                        for part in line.components(separatedBy: ", ") {
-                            if part.starts(with: "sdBitDepth") {
-                                newBitDepth = UInt32(part.components(separatedBy: " ")[2])
-                            } else if part.starts(with: "asbdSampleRate") {
-                                newSampleRate = Double(part.components(separatedBy: " ")[2])
-                            } else if part.starts(with: "asbdNumChannels") {
-                                newChannels = UInt32(part.components(separatedBy: " ")[2])
-                            } else if part.starts(with: "asbdFormatID") {
-                                newFormatId = part.components(separatedBy: " ")[2]
-                            }
+                    // found lossless media format info log
+                    if line.contains(mediaFormatPattern) {
+                        bitDepth = nil
+                        sampleRate = nil
+                        numChannels = nil
+                        asbdFormatId = nil
+                        if let m = line.firstMatch(of: bitDepthPattern) {
+                            bitDepth = UInt32(m.1)
                         }
                         
-                        if let bitDepth = newBitDepth, let sampleRate = newSampleRate, let channels = newChannels, let formatId = newFormatId {
-                            print("New playing media format (\(formatId)) : nbChannels: \(channels), bitDepth: \(bitDepth), sample rate: \(sampleRate * 1000)")
-                            self?.newFormatDetected?(channels, bitDepth, sampleRate * 1000, formatId)
+                        if let m = line.firstMatch(of: sampleRatePattern) {
+                            sampleRate = Double(m.1)
+                        }
+                        
+                        if let m = line.firstMatch(of: numChannelsPattern) {
+                            numChannels = UInt32(m.1)
+                        }
+                        
+                        if let m = line.firstMatch(of: formatIdPattern) {
+                            asbdFormatId = String(m.1)
+                        }
+
+                        
+                        if let bitDepth, let sampleRate, let numChannels, let asbdFormatId {
+                            print("New playing media format (\(asbdFormatId)) : nbChannels: \(numChannels), bitDepth: \(bitDepth), sampleRate: \(sampleRate * 1000)")
+                            self?.newFormatDetected?(numChannels, bitDepth, sampleRate * 1000, asbdFormatId)
                         }
                     }
                     
