@@ -11,8 +11,8 @@ import CoreAudio
 
 class OutputDevices {
     
-    var devices: [AudioDeviceID: (name: String, formats: [AudioStreamBasicDescription])] = [:]
-    var defaultDeviceID: AudioDeviceID = 0
+    var devices: [(deviceId: AudioDeviceID, name: String, has16Bits: Bool, formats: [AudioStreamBasicDescription])] = []
+    var defaultDeviceId: AudioDeviceID = 0
     var currentDeviceASBD = AudioStreamBasicDescription()
     
     var onFormatChanged: ((AudioStreamBasicDescription) -> Void)?
@@ -35,12 +35,13 @@ class OutputDevices {
                 let asbds = getSupportedOutputASBDs(for: deviceID)
                 
                 // only allow devices which has 24 bit depth
-                let has24Bits = asbds.contains { asbd -> Bool in
-                    return asbd.mBitsPerChannel == 24
-                }
-                
-                if has24Bits {
-                    devices[deviceID] = (name: deviceName, formats: asbds)
+                if asbds.contains(where: { $0.mBitsPerChannel == 24 }) {
+                    devices.append((
+                        deviceId: deviceID,
+                        name: deviceName,
+                        has16Bits: asbds.contains(where: {$0.mBitsPerChannel == 16}),
+                        formats: asbds
+                    ))
                 }
             }
         }
@@ -50,9 +51,8 @@ class OutputDevices {
         
     }
     
-    func changeFormat(channel: UInt32, bitDepth: UInt32, sampleRate: Double, formatID: String) {
-        if let asbds = devices[defaultDeviceID]?.formats {
-            
+    func changeFormat(channel: UInt32, bitDepth: UInt32, sampleRate: Double, formatId: String) {
+        if let asbds = devices.first(where: {$0.deviceId == defaultDeviceId})?.formats {
             var propertyAddress = AudioObjectPropertyAddress(
                 mSelector: kAudioStreamPropertyPhysicalFormat, // 通常获取物理格式
                 mScope: kAudioObjectPropertyScopeOutput,      // 查询输出范围
@@ -62,7 +62,7 @@ class OutputDevices {
             
             var currentAsbd = AudioStreamBasicDescription()
             var status = AudioObjectGetPropertyData(
-                defaultDeviceID,
+                defaultDeviceId,
                 &propertyAddress,
                 0,
                 nil,
@@ -78,14 +78,13 @@ class OutputDevices {
             }
             
             // Still no suitable format found, then do nothing
-            
             if status == noErr, var newAsbd = newAsbdCandidate {
                 if currentAsbd.mBitsPerChannel != newAsbd.mBitsPerChannel ||
                     UInt(currentAsbd.mSampleRate) != UInt(newAsbd.mSampleRate) ||
                     currentAsbd.mChannelsPerFrame != newAsbd.mChannelsPerFrame {
                     
                     status = AudioObjectSetPropertyData(
-                        defaultDeviceID,
+                        defaultDeviceId,
                         &propertyAddress,
                         0,
                         nil,
@@ -124,7 +123,7 @@ class OutputDevices {
             0,
             nil,
             &defaultDeviceSize,
-            &defaultDeviceID
+            &defaultDeviceId
         )
         
         if result != noErr {
@@ -133,19 +132,10 @@ class OutputDevices {
         
         var propertySize = UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
 
-        // 修改属性地址以查询流格式
-        defaultDeviceAddress.mSelector = kAudioStreamPropertyPhysicalFormat // 查询物理格式
-        defaultDeviceAddress.mScope = kAudioObjectPropertyScopeOutput       // 输出作用域
-        // mElement 保持不变 (kAudioObjectPropertyElementMain 或 0)
+        defaultDeviceAddress.mSelector = kAudioStreamPropertyPhysicalFormat
+        defaultDeviceAddress.mScope = kAudioObjectPropertyScopeOutput
 
-        let getASBDStatus = AudioObjectGetPropertyData(
-            defaultDeviceID,          // 查询特定设备
-            &defaultDeviceAddress,  // 属性地址
-            0,                 // 无需限定符数据
-            nil,               // 无需限定符数据
-            &propertySize,     // 输入：缓冲区大小；输出：实际数据大小
-            &currentDeviceASBD              // 接收 ASBD 的指针
-        )
+        AudioObjectGetPropertyData(defaultDeviceId, &defaultDeviceAddress, 0, nil, &propertySize, &currentDeviceASBD)
     }
     
     private func getDeviceIds() -> [AudioDeviceID] {
@@ -195,7 +185,7 @@ class OutputDevices {
 
         var streamsSize: UInt32 = 0
         guard AudioObjectGetPropertyDataSize(deviceID, &address, 0, nil, &streamsSize) == noErr else {
-            print("  (无法获取流数量)")
+            print("Can not get audio stream count for device \(deviceID).")
             return []
         }
 
@@ -203,7 +193,7 @@ class OutputDevices {
         var streamIDs = [AudioStreamID](repeating: 0, count: streamCount)
 
         guard AudioObjectGetPropertyData(deviceID, &address, 0, nil, &streamsSize, &streamIDs) == noErr else {
-            print("  (无法获取流 ID)")
+            print("Can not get audio stream ids for device \(deviceID)")
             return []
         }
         
