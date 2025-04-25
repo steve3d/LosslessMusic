@@ -11,7 +11,7 @@ Let's say if the next song that you are playing, is a Hi-Res Lossless track with
 
 The opposite happens, when the next track happens to have a lower sample rate. 
 
-Note, some DAC on MacOS 15.4(Sequoa) might missing the 16-bits depths, so for those musics, there is no bit-perfect playback.
+Note, some DAC on MacOS 15.4(Sequoa) might missing the 16bit depths, but CoreAudio use zero-padding, so playing 16bit files with 24bit is still bit-perfect.
 
 ## Installation
 Drag the app to your Applications folder. If you wish to have it running when logging in, you should be able to add LosslessMusic in System Settings:
