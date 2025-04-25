@@ -6,27 +6,8 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
-		505D24572DB9D21A00FA1A02 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 505D24402DB9D21A00FA1A02 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 505D24472DB9D21A00FA1A02;
-			remoteInfo = LosslessMusic;
-		};
-		505D24612DB9D21A00FA1A02 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 505D24402DB9D21A00FA1A02 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 505D24472DB9D21A00FA1A02;
-			remoteInfo = LosslessMusic;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		505D24482DB9D21A00FA1A02 /* LosslessMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LosslessMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		505D24562DB9D21A00FA1A02 /* LosslessMusicTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LosslessMusicTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		505D24602DB9D21A00FA1A02 /* LosslessMusicUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LosslessMusicUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -39,20 +20,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		505D24452DB9D21A00FA1A02 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		505D24532DB9D21A00FA1A02 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		505D245D2DB9D21A00FA1A02 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -74,8 +41,6 @@
 			isa = PBXGroup;
 			children = (
 				505D24482DB9D21A00FA1A02 /* LosslessMusic.app */,
-				505D24562DB9D21A00FA1A02 /* LosslessMusicTests.xctest */,
-				505D24602DB9D21A00FA1A02 /* LosslessMusicUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,46 +70,6 @@
 			productReference = 505D24482DB9D21A00FA1A02 /* LosslessMusic.app */;
 			productType = "com.apple.product-type.application";
 		};
-		505D24552DB9D21A00FA1A02 /* LosslessMusicTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 505D246D2DB9D21A00FA1A02 /* Build configuration list for PBXNativeTarget "LosslessMusicTests" */;
-			buildPhases = (
-				505D24522DB9D21A00FA1A02 /* Sources */,
-				505D24532DB9D21A00FA1A02 /* Frameworks */,
-				505D24542DB9D21A00FA1A02 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				505D24582DB9D21A00FA1A02 /* PBXTargetDependency */,
-			);
-			name = LosslessMusicTests;
-			packageProductDependencies = (
-			);
-			productName = LosslessMusicTests;
-			productReference = 505D24562DB9D21A00FA1A02 /* LosslessMusicTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		505D245F2DB9D21A00FA1A02 /* LosslessMusicUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 505D24702DB9D21A00FA1A02 /* Build configuration list for PBXNativeTarget "LosslessMusicUITests" */;
-			buildPhases = (
-				505D245C2DB9D21A00FA1A02 /* Sources */,
-				505D245D2DB9D21A00FA1A02 /* Frameworks */,
-				505D245E2DB9D21A00FA1A02 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				505D24622DB9D21A00FA1A02 /* PBXTargetDependency */,
-			);
-			name = LosslessMusicUITests;
-			packageProductDependencies = (
-			);
-			productName = LosslessMusicUITests;
-			productReference = 505D24602DB9D21A00FA1A02 /* LosslessMusicUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -157,14 +82,6 @@
 				TargetAttributes = {
 					505D24472DB9D21A00FA1A02 = {
 						CreatedOnToolsVersion = 16.3;
-					};
-					505D24552DB9D21A00FA1A02 = {
-						CreatedOnToolsVersion = 16.3;
-						TestTargetID = 505D24472DB9D21A00FA1A02;
-					};
-					505D245F2DB9D21A00FA1A02 = {
-						CreatedOnToolsVersion = 16.3;
-						TestTargetID = 505D24472DB9D21A00FA1A02;
 					};
 				};
 			};
@@ -183,28 +100,12 @@
 			projectRoot = "";
 			targets = (
 				505D24472DB9D21A00FA1A02 /* LosslessMusic */,
-				505D24552DB9D21A00FA1A02 /* LosslessMusicTests */,
-				505D245F2DB9D21A00FA1A02 /* LosslessMusicUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		505D24462DB9D21A00FA1A02 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		505D24542DB9D21A00FA1A02 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		505D245E2DB9D21A00FA1A02 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -221,34 +122,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		505D24522DB9D21A00FA1A02 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		505D245C2DB9D21A00FA1A02 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		505D24582DB9D21A00FA1A02 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 505D24472DB9D21A00FA1A02 /* LosslessMusic */;
-			targetProxy = 505D24572DB9D21A00FA1A02 /* PBXContainerItemProxy */;
-		};
-		505D24622DB9D21A00FA1A02 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 505D24472DB9D21A00FA1A02 /* LosslessMusic */;
-			targetProxy = 505D24612DB9D21A00FA1A02 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		505D24682DB9D21A00FA1A02 /* Debug */ = {
@@ -304,7 +178,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -361,7 +235,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -377,7 +251,7 @@
 				CODE_SIGN_ENTITLEMENTS = LosslessMusic/LosslessMusic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = T4TRFKWNSR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -406,10 +280,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = LosslessMusic/LosslessMusic.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = T4TRFKWNSR;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Lossless Music";
@@ -424,73 +298,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vrdd.LosslessMusic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		505D246E2DB9D21A00FA1A02 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.4;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vrdd.LosslessMusicTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LosslessMusic.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LosslessMusic";
-			};
-			name = Debug;
-		};
-		505D246F2DB9D21A00FA1A02 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.4;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vrdd.LosslessMusicTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LosslessMusic.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LosslessMusic";
-			};
-			name = Release;
-		};
-		505D24712DB9D21A00FA1A02 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vrdd.LosslessMusicUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = LosslessMusic;
-			};
-			name = Debug;
-		};
-		505D24722DB9D21A00FA1A02 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vrdd.LosslessMusicUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = LosslessMusic;
 			};
 			name = Release;
 		};
@@ -511,24 +322,6 @@
 			buildConfigurations = (
 				505D246B2DB9D21A00FA1A02 /* Debug */,
 				505D246C2DB9D21A00FA1A02 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		505D246D2DB9D21A00FA1A02 /* Build configuration list for PBXNativeTarget "LosslessMusicTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				505D246E2DB9D21A00FA1A02 /* Debug */,
-				505D246F2DB9D21A00FA1A02 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		505D24702DB9D21A00FA1A02 /* Build configuration list for PBXNativeTarget "LosslessMusicUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				505D24712DB9D21A00FA1A02 /* Debug */,
-				505D24722DB9D21A00FA1A02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
