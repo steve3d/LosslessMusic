@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let selectedDeviceMenuItem = NSMenuItem()
     
     func setSelectedDeviceName(_ name: String) {
-        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 180, height: 30))
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 30))
         field.isEditable = false
         field.isBezeled = false
         field.drawsBackground = false
@@ -50,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func setSampleRate(_ rate: Double, _ bit: UInt32) {
-        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 180, height: 50))
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 50))
         field.isEditable = false
         field.isBezeled = false 
         field.drawsBackground = false
@@ -107,6 +107,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(sampleRateMenuItem)
         menu.addItem(selectedDeviceMenuItem)
         menu.addItem(NSMenuItem.separator())
+        menu.addItem(withTitle: "BitDepth Switching", action: #selector(toggleBitDepthChange(_:)), keyEquivalent: "")
+            .state = outputDevices?.enableBitDepthChange == true ? .on : .off
         menu.addItem(withTitle: "Selected Device", action: nil, keyEquivalent: "").submenu = createDevicesSubmenu()
         menu.addItem(withTitle: "About", action: nil, keyEquivalent: "").submenu = createAboutSubmenu()
         menu.addItem(NSMenuItem.separator())
@@ -133,6 +135,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+    
+    @objc private func toggleBitDepthChange(_ sender: NSMenuItem) {
+        if let outputDevices {
+            outputDevices.enableBitDepthChange = !outputDevices.enableBitDepthChange
+        }
+        
+        sender.state = outputDevices?.enableBitDepthChange == true ? .on : .off
     }
 
     @objc private func quit() {

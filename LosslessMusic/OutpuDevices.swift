@@ -10,7 +10,7 @@ import CoreAudio
 
 
 class OutputDevices {
-    
+    var enableBitDepthChange = true
     var devices: [(deviceId: AudioDeviceID, name: String, has16Bits: Bool, formats: [AudioStreamBasicDescription])] = []
     var defaultDeviceId: AudioDeviceID = 0
     var currentDeviceASBD = AudioStreamBasicDescription()
@@ -70,10 +70,14 @@ class OutputDevices {
                 &currentAsbd
             )
             
-            var newAsbdCandidate = asbds.first { i in matchFormat(asbd: i, channel: channel, bitDepth: bitDepth, sampleRate: sampleRate)}
+            // always use 24bit depth if disabled bit depth change
+            let targetBitDepth = enableBitDepthChange ? bitDepth : 24
+            
+            var newAsbdCandidate = asbds.first { i in matchFormat(asbd: i, channel: channel, bitDepth: targetBitDepth, sampleRate: sampleRate)}
             
             // On macos 15.4, some dac don't have 16bit anymore, so check 24-bit
-            if newAsbdCandidate == nil && bitDepth == 16 {
+            // it's still bit-perfect
+            if newAsbdCandidate == nil && targetBitDepth == 16 {
                 newAsbdCandidate = asbds.first { i in matchFormat(asbd: i, channel: channel, bitDepth: 24, sampleRate: sampleRate)}
             }
             
