@@ -60,9 +60,7 @@ class LogMonitor {
         process?.arguments = [
             "stream",
             "--predicate",
-            "subsystem == 'com.apple.Music' AND category == 'ampplay'",
-            "--style",
-            "compact" // Use compact style for simpler parsing
+            "subsystem == 'com.apple.Music' AND category == 'ampplay' AND composedMessage CONTAINS 'mediaFormatinfo'"
         ]
         process?.standardOutput = pipe // only need standard output
         
@@ -83,6 +81,14 @@ class LogMonitor {
         do {
             try process?.run()
         } catch {
+            let alert = NSAlert()
+            alert.messageText = "Unable to listen logs"
+            alert.informativeText = "This should not happen, but I can not listen to system logs with the /usr/bin/log program. And I don't know why...."
+            alert.alertStyle = .critical
+            alert.addButton(withTitle: "OK")
+
+            alert.runModal()
+
             print("Failed to launch log stream process: \(error)")
         }
     }
@@ -108,10 +114,6 @@ class LogMonitor {
         
         // find lossless media format info log
         if line.contains(mediaFormatPattern) {
-            bitDepth = nil
-            sampleRate = nil
-            numChannels = nil
-            asbdFormatId = nil
             if let m = line.firstMatch(of: bitDepthPattern) {
                 bitDepth = UInt32(m.1)
             }
@@ -130,7 +132,7 @@ class LogMonitor {
 
             
             if let bitDepth, let sampleRate, let numChannels, let asbdFormatId {
-                print("New playing media format (\(asbdFormatId)) : nbChannels: \(numChannels), bitDepth: \(bitDepth), sampleRate: \(sampleRate * 1000)")
+                print("New playing media format (\(asbdFormatId)) : Channels: \(numChannels), bitDepth: \(bitDepth), sampleRate: \(sampleRate * 1000)")
                 
                 // must run on main thread
                 DispatchQueue.main.async { [self] in
