@@ -101,13 +101,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             setSampleRate(asbd.mSampleRate, asbd.mBitsPerChannel)
         }
         
+        setSelectedDeviceName("Unknown")
         setSampleRate(outputDevices?.currentDeviceASBD.mSampleRate ?? 44100, outputDevices?.currentDeviceASBD.mBitsPerChannel ?? 16)
 
         let menu = NSMenu()
         menu.addItem(sampleRateMenuItem)
         menu.addItem(selectedDeviceMenuItem)
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(withTitle: "BitDepth Switching", action: #selector(toggleBitDepthChange(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: "Bit Depth Switching", action: #selector(toggleBitDepthChange(_:)), keyEquivalent: "")
             .state = outputDevices?.enableBitDepthChange == true ? .on : .off
         menu.addItem(withTitle: "Selected Device", action: nil, keyEquivalent: "").submenu = createDevicesSubmenu()
         menu.addItem(withTitle: "About", action: nil, keyEquivalent: "").submenu = createAboutSubmenu()

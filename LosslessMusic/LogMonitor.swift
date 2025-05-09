@@ -13,6 +13,7 @@ class LogMonitor {
     private var process: Process?
     private var pipe: Pipe?
     private var defaultDeviceId: AudioDeviceID = 0
+    private var newMediaFormatInfo = false
     
     // media format info for lossless only
     private let mediaFormatPattern = /play\> cm\>> mediaFormatinfo.*lossless,/
@@ -21,6 +22,11 @@ class LogMonitor {
     private let sampleRatePattern = /asbdSampleRate = (\d+(?:\.\d+)?)/
     private let formatIdPattern = /asbdFormatID = (\w+)/
     private let numChannelsPattern = /asbdNumChannels = (\d+)/
+    
+    private var bitDepth: UInt32?
+    private var sampleRate: Double?
+    private var numChannels: UInt32?
+    private var asbdFormatId: String?
 
     
     // Callback for media start to play, use call back for extreme simple solution
@@ -60,7 +66,7 @@ class LogMonitor {
         process?.arguments = [
             "stream",
             "--predicate",
-            "subsystem == 'com.apple.Music' AND category == 'ampplay' AND composedMessage CONTAINS 'mediaFormatinfo'"
+            "subsystem == 'com.apple.Music' AND category == 'ampplay'"
         ]
         process?.standardOutput = pipe // only need standard output
         
@@ -107,12 +113,14 @@ class LogMonitor {
     }
     
     private func processLogLine(_ line: String.SubSequence) {
-        var bitDepth: UInt32?
-        var sampleRate: Double?
-        var numChannels: UInt32?
-        var asbdFormatId: String?
-        
-        // find lossless media format info log
+        /*
+         The full log will be look like
+         
+         play> cm>> mediaFormatinfo '<private>' , songEnhanced, audioCapabilities: 0x10, 0x10, asbdFormatID = qlac, sdFormatID = alac, high res lossless, asbdNumChannels = 2, sdNumChannels = 2, sdBitDepth = 24 bit, asbdSampleRate = 96.0 kHz, is not rendering spatial audio
+         
+         Important thing is these log will popup when new track start to play, the current track is near ended and shuffle
+         So I can not rely on this log to switch the sample rate, must switch at track start to play.
+         */
         if line.contains(mediaFormatPattern) {
             if let m = line.firstMatch(of: bitDepthPattern) {
                 bitDepth = UInt32(m.1)
@@ -130,15 +138,33 @@ class LogMonitor {
                 asbdFormatId = String(m.1)
             }
 
+            newMediaFormatInfo = true
+        }
+        
+        // normal playing to next will contain
+        // play> book> '<private>' triggerCountTrackSkipOrPlay time
+        
+        // skip to next will contain
+        // play> lease> fp status = 1, havelease 1
+        if line.contains("triggerCountTrackSkipOrPlay") ||
+            line.contains("fp status = 1, havelease 1") {
             
-            if let bitDepth, let sampleRate, let numChannels, let asbdFormatId {
-                print("New playing media format (\(asbdFormatId)) : Channels: \(numChannels), bitDepth: \(bitDepth), sampleRate: \(sampleRate * 1000)")
+            if newMediaFormatInfo, let bitDepth, let sampleRate, let numChannels, let asbdFormatId {
+                newMediaFormatInfo = false
+                
+                print("Requesting new media format (\(asbdFormatId)) : Channels: \(numChannels), bitDepth: \(bitDepth), sampleRate: \(sampleRate * 1000)")
                 
                 // must run on main thread
                 DispatchQueue.main.async { [self] in
                     newFormatDetected?(numChannels, bitDepth, sampleRate * 1000, asbdFormatId)
                 }
+                
+                self.bitDepth = nil
+                self.sampleRate = nil
+                self.numChannels = nil
+                self.asbdFormatId = nil
             }
+            
         }
     }
 }
