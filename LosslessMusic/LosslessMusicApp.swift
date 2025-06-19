@@ -26,6 +26,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     let sampleRateMenuItem = NSMenuItem()
     let selectedDeviceMenuItem = NSMenuItem()
+    let distributedCenter = DistributedNotificationCenter.default()
+    
+    deinit {
+        DistributedNotificationCenter.default().removeObserver(self)
+    }
     
     func setSelectedDeviceName(_ name: String) {
         let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 30))
@@ -121,8 +126,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for item in menu.items {
             item.target = self
         }
+        
+        // Listen to Music.app playing info change
+        distributedCenter.addObserver(
+            self,
+            selector: #selector(handleDistributedNowPlayingInfoChanged),
+            name: NSNotification.Name("com.apple.iTunes.playerInfo"),
+            object: nil
+        )
     }
-    
+
+    @objc private func handleDistributedNowPlayingInfoChanged(notification: Notification) {
+        // 分布式通知的 userInfo 字典本身就包含了播放信息
+        // 我们可以直接使用它，也可以再次查询 MPNowPlayingInfoCenter
+        if let userInfo = notification.userInfo {
+            let state = userInfo["Player State"] as? String ?? "Unknown"
+//            userInfo.forEach { key, value in
+//                print("  - \(key): \(value)")
+//            }
+//            
+//            var id = userInfo["Store URL"] as? String
+            
+            if state == "Playing" {
+                logMonitor?.setCurrentPlayInfo(userInfo["Store URL"] as? String, Date().timeIntervalSince1970)
+            } else {
+                logMonitor?.setCurrentPlayInfo(nil, 0)
+            }
+                
+                    
+
+        }
+    }
 
     @objc private func selectDevice(_ sender: NSMenuItem) {
         if let deviceID = sender.representedObject as? AudioDeviceID, let devices = outputDevices {

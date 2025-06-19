@@ -10,9 +10,22 @@
 		505D24482DB9D21A00FA1A02 /* LosslessMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LosslessMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5072C3BC2E03A4D100DA0A98 /* Exceptions for "LosslessMusic" folder in "LosslessMusic" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 505D24472DB9D21A00FA1A02 /* LosslessMusic */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		505D244A2DB9D21A00FA1A02 /* LosslessMusic */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5072C3BC2E03A4D100DA0A98 /* Exceptions for "LosslessMusic" folder in "LosslessMusic" target */,
+			);
 			path = LosslessMusic;
 			sourceTree = "<group>";
 		};
@@ -251,13 +264,15 @@
 				CODE_SIGN_ENTITLEMENTS = LosslessMusic/LosslessMusic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = T4TRFKWNSR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LosslessMusic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Lossless Music";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Need Music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -282,13 +297,16 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LosslessMusic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Lossless Music";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Need Music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
