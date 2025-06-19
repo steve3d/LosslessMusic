@@ -5,21 +5,23 @@
 //  Created by Steve Yin on 2025/4/24.
 //
 
-import Foundation
 import CoreAudio
-
+import Foundation
 
 class OutputDevices {
-    var enableBitDepthChange = true
-    var devices: [(deviceId: AudioDeviceID, name: String, has16Bits: Bool, formats: [AudioStreamBasicDescription])] = []
+    var devices:
+        [(
+            deviceId: AudioDeviceID, name: String, has16Bits: Bool,
+            formats: [AudioStreamBasicDescription]
+        )] = []
     var defaultDeviceId: AudioDeviceID = 0
     var currentDeviceASBD = AudioStreamBasicDescription()
-    
+
     var onFormatChanged: ((AudioStreamBasicDescription) -> Void)?
-    
+
     init() {
         updateCurrentDevice()
-        
+
         for deviceID in getDeviceIds() {
             var address = AudioObjectPropertyAddress(
                 mSelector: kAudioObjectPropertyName,
@@ -30,36 +32,58 @@ class OutputDevices {
             var name: CFString = "" as CFString
             var size = UInt32(MemoryLayout<CFString>.size)
 
-            let status = AudioObjectGetPropertyData(deviceID, &address, 0, nil, &size, &name)
-            if status == noErr, isOutputDevice(deviceID), let deviceName = name as String? {
+            let status = AudioObjectGetPropertyData(
+                deviceID,
+                &address,
+                0,
+                nil,
+                &size,
+                &name
+            )
+            if status == noErr, isOutputDevice(deviceID),
+                let deviceName = name as String?
+            {
                 let asbds = getSupportedOutputASBDs(for: deviceID)
-                
+
                 // only allow devices which has 24 bit depth
                 if asbds.contains(where: { $0.mBitsPerChannel == 24 }) {
-                    devices.append((
-                        deviceId: deviceID,
-                        name: deviceName,
-                        has16Bits: asbds.contains(where: {$0.mBitsPerChannel == 16}),
-                        formats: asbds
-                    ))
+                    devices.append(
+                        (
+                            deviceId: deviceID,
+                            name: deviceName,
+                            has16Bits: asbds.contains(where: {
+                                $0.mBitsPerChannel == 16
+                            }),
+                            formats: asbds
+                        )
+                    )
                 }
             }
         }
     }
 
     deinit {
-        
+
     }
-    
-    func changeFormat(channel: UInt32, bitDepth: UInt32, sampleRate: Double, formatId: String) {
-        if let asbds = devices.first(where: {$0.deviceId == defaultDeviceId})?.formats {
+
+    func changeFormat(
+        channel: UInt32,
+        bitDepth: UInt32,
+        sampleRate: Double,
+        formatId: String
+    ) {
+        if let asbds = devices.first(where: { $0.deviceId == defaultDeviceId })?
+            .formats
+        {
             var propertyAddress = AudioObjectPropertyAddress(
-                mSelector: kAudioStreamPropertyPhysicalFormat, // 通常获取物理格式
-                mScope: kAudioObjectPropertyScopeOutput,      // 查询输出范围
-                mElement: kAudioObjectPropertyElementMain     // 主要元素
+                mSelector: kAudioStreamPropertyPhysicalFormat,  // 通常获取物理格式
+                mScope: kAudioObjectPropertyScopeOutput,  // 查询输出范围
+                mElement: kAudioObjectPropertyElementMain  // 主要元素
             )
-            var propertySize = UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
-            
+            var propertySize = UInt32(
+                MemoryLayout<AudioStreamBasicDescription>.size
+            )
+
             var currentAsbd = AudioStreamBasicDescription()
             var status = AudioObjectGetPropertyData(
                 defaultDeviceId,
@@ -69,24 +93,28 @@ class OutputDevices {
                 &propertySize,
                 &currentAsbd
             )
-            
-            // always use 24bit depth if disabled bit depth change
-            let targetBitDepth = enableBitDepthChange ? bitDepth : 24
-            
-            var newAsbdCandidate = asbds.first { i in matchFormat(asbd: i, channel: channel, bitDepth: targetBitDepth, sampleRate: sampleRate)}
-            
+
             // On macos 15.4, some dac don't have 16bit anymore, so check 24-bit
             // it's still bit-perfect
-            if newAsbdCandidate == nil && targetBitDepth == 16 {
-                newAsbdCandidate = asbds.first { i in matchFormat(asbd: i, channel: channel, bitDepth: 24, sampleRate: sampleRate)}
-            }
             
+            var newAsbdCandidate = asbds.first { i in
+                matchFormat(
+                    asbd: i,
+                    channel: channel,
+                    bitDepth: bitDepth,
+                    sampleRate: sampleRate
+                )
+            }
+
             // Still no suitable format found, then do nothing
             if status == noErr, var newAsbd = newAsbdCandidate {
-                if currentAsbd.mBitsPerChannel != newAsbd.mBitsPerChannel ||
-                    UInt(currentAsbd.mSampleRate) != UInt(newAsbd.mSampleRate) ||
-                    currentAsbd.mChannelsPerFrame != newAsbd.mChannelsPerFrame {
-                    
+                if currentAsbd.mBitsPerChannel != newAsbd.mBitsPerChannel
+                    || UInt(currentAsbd.mSampleRate)
+                        != UInt(newAsbd.mSampleRate)
+                    || currentAsbd.mChannelsPerFrame
+                        != newAsbd.mChannelsPerFrame
+                {
+
                     status = AudioObjectSetPropertyData(
                         defaultDeviceId,
                         &propertyAddress,
@@ -95,25 +123,40 @@ class OutputDevices {
                         propertySize,
                         &newAsbd
                     )
-                    
+
                     if status == noErr {
-                        print("Successfully changed format to \(newAsbd.mBitsPerChannel)bits, \(newAsbd.mSampleRate)")
+                        print(
+                            "Successfully changed format to \(newAsbd.mBitsPerChannel)bits, \(newAsbd.mSampleRate)"
+                        )
                         onFormatChanged?(newAsbd)
                     } else {
-                        print("Unable changed format to \(newAsbd.mBitsPerChannel)bits, \(newAsbd.mSampleRate)")
+                        print(
+                            "Unable changed format to \(newAsbd.mBitsPerChannel)bits, \(newAsbd.mSampleRate)"
+                        )
                     }
                 }
             } else {
-                print("Unable to find a format for \(bitDepth)bits, \(sampleRate / 1000)kHz, \(channel)-channel.")
+                print(
+                    "Unable to find a format for \(bitDepth)bits, \(sampleRate / 1000)kHz, \(channel)-channel."
+                )
             }
-        
+
         }
     }
-    
-    private func matchFormat(asbd: AudioStreamBasicDescription, channel: UInt32, bitDepth: UInt32, sampleRate: Double) -> Bool {
-        return asbd.mBitsPerChannel == bitDepth && UInt(asbd.mSampleRate) == UInt(sampleRate) && asbd.mChannelsPerFrame == channel
+
+    private func matchFormat(
+        asbd: AudioStreamBasicDescription,
+        channel: UInt32,
+        bitDepth: UInt32,
+        sampleRate: Double
+    ) -> Bool {
+        // if requesting 16-bit, then 24-bit is also compatible 
+        let alternativeDepth = bitDepth == 16 ? 24 : bitDepth
+        return (asbd.mBitsPerChannel == bitDepth || asbd.mBitsPerChannel == alternativeDepth)
+            && UInt(asbd.mSampleRate) == UInt(sampleRate)
+            && asbd.mChannelsPerFrame == channel
     }
-    
+
     private func updateCurrentDevice() {
         var defaultDeviceAddress = AudioObjectPropertyAddress(
             mSelector: kAudioHardwarePropertyDefaultOutputDevice,
@@ -129,19 +172,28 @@ class OutputDevices {
             &defaultDeviceSize,
             &defaultDeviceId
         )
-        
+
         if result != noErr {
             print("Error getting default output device: \(result)")
         }
-        
-        var propertySize = UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
+
+        var propertySize = UInt32(
+            MemoryLayout<AudioStreamBasicDescription>.size
+        )
 
         defaultDeviceAddress.mSelector = kAudioStreamPropertyPhysicalFormat
         defaultDeviceAddress.mScope = kAudioObjectPropertyScopeOutput
 
-        AudioObjectGetPropertyData(defaultDeviceId, &defaultDeviceAddress, 0, nil, &propertySize, &currentDeviceASBD)
+        AudioObjectGetPropertyData(
+            defaultDeviceId,
+            &defaultDeviceAddress,
+            0,
+            nil,
+            &propertySize,
+            &currentDeviceASBD
+        )
     }
-    
+
     private func getDeviceIds() -> [AudioDeviceID] {
         var propsize: UInt32 = 0
         var address = AudioObjectPropertyAddress(
@@ -150,7 +202,15 @@ class OutputDevices {
             mElement: kAudioObjectPropertyElementMain
         )
 
-        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propsize) == noErr else {
+        guard
+            AudioObjectGetPropertyDataSize(
+                AudioObjectID(kAudioObjectSystemObject),
+                &address,
+                0,
+                nil,
+                &propsize
+            ) == noErr
+        else {
             print("Unable to get audio devices.")
             return []
         }
@@ -158,13 +218,22 @@ class OutputDevices {
         let count = Int(propsize) / MemoryLayout<AudioDeviceID>.size
         var deviceIDs = [AudioDeviceID](repeating: 0, count: count)
 
-        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propsize, &deviceIDs) == noErr else {
+        guard
+            AudioObjectGetPropertyData(
+                AudioObjectID(kAudioObjectSystemObject),
+                &address,
+                0,
+                nil,
+                &propsize,
+                &deviceIDs
+            ) == noErr
+        else {
             return []
         }
-        
+
         return deviceIDs
     }
-    
+
     private func isOutputDevice(_ deviceID: AudioDeviceID) -> Bool {
         var streamsSize: UInt32 = 0
         var address = AudioObjectPropertyAddress(
@@ -174,13 +243,22 @@ class OutputDevices {
         )
 
         if AudioObjectHasProperty(deviceID, &address),
-           AudioObjectGetPropertyDataSize(deviceID, &address, 0, nil, &streamsSize) == noErr {
+            AudioObjectGetPropertyDataSize(
+                deviceID,
+                &address,
+                0,
+                nil,
+                &streamsSize
+            ) == noErr
+        {
             return streamsSize > 0
         }
         return false
     }
-    
-    private func getSupportedOutputASBDs(for deviceID: AudioDeviceID) -> [AudioStreamBasicDescription] {
+
+    private func getSupportedOutputASBDs(for deviceID: AudioDeviceID)
+        -> [AudioStreamBasicDescription]
+    {
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioDevicePropertyStreams,
             mScope: kAudioDevicePropertyScopeOutput,
@@ -188,7 +266,15 @@ class OutputDevices {
         )
 
         var streamsSize: UInt32 = 0
-        guard AudioObjectGetPropertyDataSize(deviceID, &address, 0, nil, &streamsSize) == noErr else {
+        guard
+            AudioObjectGetPropertyDataSize(
+                deviceID,
+                &address,
+                0,
+                nil,
+                &streamsSize
+            ) == noErr
+        else {
             print("Can not get audio stream count for device \(deviceID).")
             return []
         }
@@ -196,12 +282,21 @@ class OutputDevices {
         let streamCount = Int(streamsSize) / MemoryLayout<AudioStreamID>.size
         var streamIDs = [AudioStreamID](repeating: 0, count: streamCount)
 
-        guard AudioObjectGetPropertyData(deviceID, &address, 0, nil, &streamsSize, &streamIDs) == noErr else {
+        guard
+            AudioObjectGetPropertyData(
+                deviceID,
+                &address,
+                0,
+                nil,
+                &streamsSize,
+                &streamIDs
+            ) == noErr
+        else {
             print("Can not get audio stream ids for device \(deviceID)")
             return []
         }
-        
-        var asbds: [AudioStreamBasicDescription] = [];
+
+        var asbds: [AudioStreamBasicDescription] = []
 
         for streamID in streamIDs {
             var formatSize: UInt32 = 0
@@ -211,14 +306,36 @@ class OutputDevices {
                 mElement: kAudioObjectPropertyElementMain
             )
 
-            guard AudioObjectGetPropertyDataSize(streamID, &formatAddress, 0, nil, &formatSize) == noErr else {
+            guard
+                AudioObjectGetPropertyDataSize(
+                    streamID,
+                    &formatAddress,
+                    0,
+                    nil,
+                    &formatSize
+                ) == noErr
+            else {
                 continue
             }
 
-            let formatCount = Int(formatSize) / MemoryLayout<AudioStreamRangedDescription>.size
-            var formats = [AudioStreamRangedDescription](repeating: AudioStreamRangedDescription(), count: formatCount)
+            let formatCount =
+                Int(formatSize)
+                / MemoryLayout<AudioStreamRangedDescription>.size
+            var formats = [AudioStreamRangedDescription](
+                repeating: AudioStreamRangedDescription(),
+                count: formatCount
+            )
 
-            guard AudioObjectGetPropertyData(streamID, &formatAddress, 0, nil, &formatSize, &formats) == noErr else {
+            guard
+                AudioObjectGetPropertyData(
+                    streamID,
+                    &formatAddress,
+                    0,
+                    nil,
+                    &formatSize,
+                    &formats
+                ) == noErr
+            else {
                 continue
             }
 
@@ -226,7 +343,7 @@ class OutputDevices {
                 asbds.append(format.mFormat)
             }
         }
-        
+
         return asbds
     }
 }

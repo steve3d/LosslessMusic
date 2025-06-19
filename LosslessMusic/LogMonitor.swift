@@ -27,7 +27,8 @@ struct QualityInfo: Equatable, CustomStringConvertible {
     }
 
     var description: String {
-        return "\(bitDepth)bit, \(numChannels) channels, \(sampleRate)kHz \(asbdFormatId)"
+        return
+            "\(bitDepth)bit, \(numChannels) channels, \(sampleRate)kHz \(asbdFormatId)"
     }
 
     mutating func reset() {
