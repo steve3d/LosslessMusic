@@ -5,13 +5,13 @@
 
 #  
 
-LosslessMusic switches your current audio device's sample rate to match the currently playing lossless song on your Apple Music app, automatically.
+LosslessMusic switches your current audio device's sample rate to match the currently playing lossless music on your Apple Music app, automatically.
 
 Let's say if the next song that you are playing, is a Hi-Res Lossless track with a sample rate of 192kHz, LosslessMusic will switch your device to that sample rate as soon as possible. 
 
 The opposite happens, when the next track happens to have a lower sample rate. 
 
-Note, some DAC on MacOS 15.4(Sequoa) might missing the 16bit depths, but CoreAudio use zero-padding, so playing 16bit files with 24bit is still bit-perfect.
+Note, some DAC on MacOS 15.4 (Sequoa) or later might missing the 16bit depths, but CoreAudio use zero-padding, so playing 16bit files with 24bit is still bit-perfect.
 
 ## Installation
 Drag the app to your Applications folder. If you wish to have it running when logging in, you should be able to add LosslessMusic in System Settings:
@@ -24,16 +24,14 @@ Drag the app to your Applications folder. If you wish to have it running when lo
 
 There isn't much going on, when it comes to the UI of the app, as most of the logic is to:
 1. Read Apple Music's logs to know the song's sample rate.
-2. Set the sample rate to the device that you are currently playing to.
+2. Watch the Now Playing notification so it can know when the track is changed
+3. Combine the above information to set the sample rate to the device that you are currently playing to.
 
 
 As such, the app lives on your menu bar. The screenshot above shows it's only UI component that it offers, which is to show the sample rate that it has parsed from Apple Music's logs.
 
 <img width="252" alt="app screenshot, with music note icon shown as UI button" src="https://user-images.githubusercontent.com/23420208/164895657-35a6d8a3-7e85-4c7c-bcba-9d03bfd88b4d.png">
 
-If you wish, the sample rate can also be directly visible as the menu bar item.
-
-<img width="252" alt="app screenshot with sample rate shown as UI button" src="https://user-images.githubusercontent.com/23420208/164896404-c6d27328-47e5-4eb3-bd8b-71e3c9013c46.png">
 
 Do also note that:
 - There may be short interuptions to your audio playback, during the time where the app attempts to switch the sample rates.
@@ -48,12 +46,14 @@ This still happens today, with macOS 12.3.1, despite iOS's Music app having such
 I think this improvement might be well appreciated by many, hence this project is here, free and open source.
 
 ## Prerequisites
-Due to how the app works, this app is not, and cannot be sandboxed.
-It also has the following requirement, due to the use of `OSLog` API: 
-- The user running LosslessMusic must be an **admin**. This is not tested and assumed due to this [Apple Developer Forums thread](https://developer.apple.com/forums/thread/677068).
-- Apple Music app must have Lossless mode on. (well, of course)
+Because this app requires to read the system log, and I don’t want to use the pull-query mode, so I use `log stream` which make this app can not be sandboxed.
 
-Other than that, it should run on any Mac running macOS 11.4 or later.
+I don’t want to test this on old MacOS version, So I set the minimum os version to 14.1, any version later than this can run.
+
+## Caveats
+There is a small catch: because there is no direct way of getting the current playing music’s sample rate info without using the private api, which might change between the OS version. So I have to use some trick to determine the sample rate for current playing music. And streaming music use a lot of caching, these caching might contain different information about the sample rate. So, if you shuffle one track a lot just right at next track’s info is captured and current tracks new info comes later, then the next track’s info will be lost. 
+
+But, is there anyone listen the music by shuffle one track many times, right?
 
 ## Disclaimer
 By using LosslessMusic, you agree that under no circumstances will the developer or any contributors be held responsible or liable in any way for any claims, damages, losses, expenses, costs or liabilities whatsoever or any other consequences suffered by you or incurred by you directly or indirectly in connection with any form of usages of LosslessMusic.
