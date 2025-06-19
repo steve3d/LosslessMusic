@@ -152,12 +152,12 @@ class LogMonitor {
         // so, if track is skipped, the new quality will come later
         // of track is continius play, the quality info will come when last track comes to end
         // either way, the current quality is empty, so it will always trigger change
-        currentPlayingItemId = url
 
         if url != nil && url != currentPlayingItemId {
+            currentPlayingItemId = url
             playingStartedAt = startAt
             // if track change and there is new quality info, set
-            if qualityInfo.isValid() {
+            if qualityInfo.isValid() && currentPlayingItemId != nil {
                 triggerSampleRateChange()
             }
         }
