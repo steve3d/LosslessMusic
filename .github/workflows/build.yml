@@ -27,21 +27,31 @@ jobs:
       - name: Build Release (arm64)
         run: |
           set -euo pipefail
+          build_settings=(ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO "CURRENT_PROJECT_VERSION=$GITHUB_RUN_NUMBER")
+          if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            if [[ ! "$version" =~ ^[1-9][0-9]{0,3}\.(0|[1-9][0-9]?)\.(0|[1-9][0-9]?)$ ]]; then
+              echo '::error::Expected a tag such as v1.2.3 or 1.2.3 (major 1–9999, minor/patch 0–99).'
+              exit 1
+            fi
+            build_settings+=("MARKETING_VERSION=$version")
+          fi
           xcodebuild build \
             -project LosslessMusic.xcodeproj \
             -scheme LosslessMusic \
             -configuration Release \
             -destination 'generic/platform=macOS' \
             -derivedDataPath build \
-            ARCHS=arm64 \
-            ONLY_ACTIVE_ARCH=NO \
-            CODE_SIGNING_ALLOWED=NO
+            "${build_settings[@]}"
 
       - name: Ad-hoc sign and package
         if: github.ref_type == 'tag'
         run: |
           set -euo pipefail
           app='build/Build/Products/Release/LosslessMusic.app'
+          version="${GITHUB_REF_NAME#v}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")" = "$version"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")" = "$GITHUB_RUN_NUMBER"
           codesign --force --sign - "$app"
           codesign --verify --deep --strict --verbose=2 "$app"
           tag_name="${GITHUB_REF_NAME//[^a-zA-Z0-9._-]/_}"
