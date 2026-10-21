@@ -1,0 +1,87 @@
+name: Build and Release
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: xcode-27
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build Release (arm64)
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project LosslessMusic.xcodeproj \
+            -scheme LosslessMusic \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Ad-hoc sign and package
+        if: github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          app='build/Build/Products/Release/LosslessMusic.app'
+          codesign --force --sign - "$app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          tag_name="${GITHUB_REF_NAME//[^a-zA-Z0-9._-]/_}"
+          mkdir -p dist
+          ditto -c -k --sequesterRsrc --keepParent "$app" "dist/LosslessMusic-${tag_name}-arm64.zip"
+
+      - name: Upload release package
+        if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-package
+          path: dist/*.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  release:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-package
+          path: dist
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/*.zip --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/*.zip \
+              --verify-tag --title "$RELEASE_TAG" --generate-notes
+          fi

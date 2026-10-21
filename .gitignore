@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Xcode local state and build products
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+*.xcarchive
+*.dSYM/
+
+# Local diagnostic captures
+*.log
+*.ndjson
+
+# Signing credentials and local overrides
+*.p12
+*.pfx
+*.p8
+*.mobileprovision
+*.provisionprofile
+Signing.local.xcconfig
