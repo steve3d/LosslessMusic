@@ -13,6 +13,8 @@ jobs:
   build:
     runs-on: xcode-27
     timeout-minutes: 30
+    outputs:
+      prerelease: ${{ steps.version.outputs.prerelease }}
     defaults:
       run:
         shell: bash
@@ -24,17 +26,47 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: Build Release (arm64)
+      - name: Resolve version and build number
+        id: version
         run: |
           set -euo pipefail
-          build_settings=(ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO "CURRENT_PROJECT_VERSION=$GITHUB_RUN_NUMBER")
+          version=''
+          build_number="$GITHUB_RUN_NUMBER"
+          prerelease=false
+          package_label="build-${GITHUB_RUN_NUMBER}"
           if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then
-            version="${GITHUB_REF_NAME#v}"
-            if [[ ! "$version" =~ ^[1-9][0-9]{0,3}\.(0|[1-9][0-9]?)\.(0|[1-9][0-9]?)$ ]]; then
-              echo '::error::Expected a tag such as v1.2.3 or 1.2.3 (major 1–9999, minor/patch 0–99).'
+            tag_version="${GITHUB_REF_NAME#v}"
+            if [[ ! "$tag_version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-([a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*))?$ ]]; then
+              echo '::error::Expected a tag such as v1.2.3, v1.2.3-42 or v1.2.3-beta.1.'
               exit 1
             fi
-            build_settings+=("MARKETING_VERSION=$version")
+            version="${tag_version%%-*}"
+            if [[ "$tag_version" == *-* ]]; then
+              suffix="${tag_version#*-}"
+              if [[ "$suffix" =~ ^[0-9]+$ ]]; then
+                if [[ ! "$suffix" =~ ^[1-9][0-9]*$ ]]; then
+                  echo '::error::A numeric build suffix must be positive and have no leading zeros.'
+                  exit 1
+                fi
+                build_number="$suffix"
+              else
+                prerelease=true
+              fi
+            fi
+            package_label="$GITHUB_REF_NAME"
+          fi
+          printf 'version=%s\nbuild_number=%s\nprerelease=%s\npackage_label=%s\n' \
+            "$version" "$build_number" "$prerelease" "$package_label" >> "$GITHUB_OUTPUT"
+
+      - name: Build Release (arm64)
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build_number }}
+        run: |
+          set -euo pipefail
+          build_settings=(ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO "CURRENT_PROJECT_VERSION=$BUILD_NUMBER")
+          if [[ -n "$APP_VERSION" ]]; then
+            build_settings+=("MARKETING_VERSION=$APP_VERSION")
           fi
           xcodebuild build \
             -project LosslessMusic.xcodeproj \
@@ -45,24 +77,27 @@ jobs:
             "${build_settings[@]}"
 
       - name: Ad-hoc sign and package
-        if: github.ref_type == 'tag'
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build_number }}
+          PACKAGE_LABEL: ${{ steps.version.outputs.package_label }}
         run: |
           set -euo pipefail
           app='build/Build/Products/Release/LosslessMusic.app'
-          version="${GITHUB_REF_NAME#v}"
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")" = "$version"
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")" = "$GITHUB_RUN_NUMBER"
+          if [[ -n "$APP_VERSION" ]]; then
+            test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")" = "$APP_VERSION"
+          fi
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")" = "$BUILD_NUMBER"
           codesign --force --sign - "$app"
           codesign --verify --deep --strict --verbose=2 "$app"
-          tag_name="${GITHUB_REF_NAME//[^a-zA-Z0-9._-]/_}"
+          package_label="${PACKAGE_LABEL//[^a-zA-Z0-9._-]/_}"
           mkdir -p dist
-          ditto -c -k --sequesterRsrc --keepParent "$app" "dist/LosslessMusic-${tag_name}-arm64.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$app" "dist/LosslessMusic-${package_label}-arm64.zip"
 
-      - name: Upload release package
-        if: github.ref_type == 'tag'
+      - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
-          name: release-package
+          name: LosslessMusic-arm64
           path: dist/*.zip
           if-no-files-found: error
           compression-level: 0
@@ -78,7 +113,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v7
         with:
-          name: release-package
+          name: LosslessMusic-arm64
           path: dist
 
       - name: Publish GitHub Release
@@ -86,12 +121,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.build.outputs.prerelease }}
         shell: bash
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" dist/*.zip --clobber
           else
-            gh release create "$RELEASE_TAG" dist/*.zip \
-              --verify-tag --title "$RELEASE_TAG" --generate-notes
+            release_options=(--verify-tag --title "$RELEASE_TAG" --generate-notes)
+            if [[ "$PRERELEASE" == 'true' ]]; then
+              release_options+=(--prerelease)
+            fi
+            gh release create "$RELEASE_TAG" dist/*.zip "${release_options[@]}"
           fi
