@@ -29,7 +29,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let image = NSImage(systemSymbolName: "waveform.path", accessibilityDescription: "Lossless Music")
         image?.isTemplate = true
         item.button?.image = image
-        item.button?.toolTip = "Lossless Music"
         item.button?.target = self
         item.button?.action = #selector(toggleMenu(_:))
         // Act on mouse down so a closing click's mouse up cannot reopen the menu.

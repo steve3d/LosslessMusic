@@ -18,100 +18,34 @@
         }
       }
     },
-    "Adjusting output format…" : {
+    "Decode failed" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adjusting output format…"
+            "value" : "Decode failed"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在调整输出格式…"
+            "value" : "解析失败"
           }
         }
       }
     },
-    "Could not configure the output device (%d)" : {
-      "comment" : "The number is a Core Audio error code.",
+    "Detecting…" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Could not configure the output device (%d)"
+            "value" : "Detecting…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "输出设备设置失败（%d）"
-          }
-        }
-      }
-    },
-    "Could not decode log entries (%lld). Check the DECODE_FAILED output in Xcode." : {
-      "comment" : "Keep DECODE_FAILED unchanged; it is a diagnostic log category.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not decode log entries (%lld). Check the DECODE_FAILED output in Xcode."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有 %lld 条日志解析失败，请查看 Xcode 中的 DECODE_FAILED 输出。"
-          }
-        }
-      }
-    },
-    "Could not read the log pipe: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not read the log pipe: %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日志管道读取失败：%@"
-          }
-        }
-      }
-    },
-    "Could not start monitoring Music logs: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not start monitoring Music logs: %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法启动 Music 日志监听：%@"
-          }
-        }
-      }
-    },
-    "Could not verify the output device format" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not verify the output device format"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法确认输出设备格式"
+            "value" : "识别格式"
           }
         }
       }
@@ -132,66 +66,50 @@
         }
       }
     },
-    "Output Devices" : {
+    "Loading…" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Output Devices"
+            "value" : "Loading…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "输出设备"
+            "value" : "读取日志"
           }
         }
       }
     },
-    "Log reader exited with code %d: %@" : {
+    "Log stopped" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Log reader exited with code %d: %@"
+            "value" : "Log stopped"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "日志读取程序已退出，退出码为 %d：%@"
+            "value" : "日志已停止"
           }
         }
       }
     },
-    "Music is not running" : {
+    "No device" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Music is not running"
+            "value" : "No device"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Music 未启动"
-          }
-        }
-      }
-    },
-    "Music log monitoring stopped" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Music log monitoring stopped"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Music 日志监听已停止"
+            "value" : "无输出设备"
           }
         }
       }
@@ -212,18 +130,34 @@
         }
       }
     },
-    "No output device available" : {
+    "Not running" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No output device available"
+            "value" : "Not running"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "没有可用的输出设备"
+            "value" : "未启动"
+          }
+        }
+      }
+    },
+    "Output Devices" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Output Devices"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输出设备"
           }
         }
       }
@@ -260,18 +194,34 @@
         }
       }
     },
-    "Reading Music logs…" : {
+    "Read failed" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reading Music logs…"
+            "value" : "Read failed"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在读取 Music 日志…"
+            "value" : "读取失败"
+          }
+        }
+      }
+    },
+    "Read-only" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read-only"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "格式只读"
           }
         }
       }
@@ -292,12 +242,12 @@
         }
       }
     },
-    "Ready to play" : {
+    "Ready" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ready to play"
+            "value" : "Ready"
           }
         },
         "zh-Hans" : {
@@ -308,66 +258,98 @@
         }
       }
     },
-    "The output device does not support this lossless format" : {
+    "Setup failed" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The output device does not support this lossless format"
+            "value" : "Setup failed"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "输出设备不支持此无损格式"
+            "value" : "设置失败"
           }
         }
       }
     },
-    "The output device format cannot be changed" : {
+    "Start failed" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The output device format cannot be changed"
+            "value" : "Start failed"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法修改输出设备格式"
+            "value" : "监听失败"
           }
         }
       }
     },
-    "Waiting for audio format…" : {
+    "Switching…" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Waiting for audio format…"
+            "value" : "Switching…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "等待音频格式…"
+            "value" : "切换格式"
           }
         }
       }
     },
-    "Waiting for playback…" : {
+    "Unsupported" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Waiting for playback…"
+            "value" : "Unsupported"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "等待播放信息…"
+            "value" : "格式不支持"
+          }
+        }
+      }
+    },
+    "Unverified" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unverified"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "验证失败"
+          }
+        }
+      }
+    },
+    "Waiting…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待播放"
           }
         }
       }

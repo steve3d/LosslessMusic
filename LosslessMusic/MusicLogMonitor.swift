@@ -88,7 +88,11 @@ final class MusicLogMonitor {
                 }, onEnd: { [weak self] error in
                     DispatchQueue.main.async { [weak self] in
                         guard let self, self.generation == token, let session = self.sessions[id] else { return }
-                        if let error { self.onError?(String(localized: "Could not read the log pipe: \(error)")); return }
+                        if let error {
+                            MusicDiagnostics.log("PIPE_READ_FAILED", error)
+                            self.onError?(String(localized: "Read failed"))
+                            return
+                        }
                         if isError { session.stderrEnded = true } else { session.stdoutEnded = true }
                         self.finishIfReady(id: id)
                     }
@@ -110,7 +114,8 @@ final class MusicLogMonitor {
         } catch {
             for reader in session.readers { reader.stop() }
             sessions.removeValue(forKey: id)
-            onError?(String(localized: "Could not start monitoring Music logs: \(error.localizedDescription)"))
+            MusicDiagnostics.log("MONITOR_START_FAILED", error.localizedDescription)
+            onError?(String(localized: "Start failed"))
         }
     }
 
@@ -159,14 +164,15 @@ final class MusicLogMonitor {
         let channel = session.historical ? "HISTORY" : "STREAM"
         MusicDiagnostics.log("\(channel)_EXIT", "status=\(status) lines=\(session.lines) decoded=\(session.decoded) failures=\(session.failures)")
         guard status == 0 else {
-            onError?(String(localized: "Log reader exited with code \(status): \(session.stderr.joined(separator: " "))"))
+            MusicDiagnostics.log("\(channel)_FAILED", "status=\(status); \(session.stderr.joined(separator: " "))")
+            onError?(String(localized: "Log stopped"))
             return
         }
         guard session.failures == 0 else {
-            onError?(String(localized: "Could not decode log entries (\(session.failures)). Check the DECODE_FAILED output in Xcode.", comment: "Keep DECODE_FAILED unchanged; it is a diagnostic log category."))
+            onError?(String(localized: "Decode failed"))
             return
         }
-        guard session.historical else { onError?(String(localized: "Music log monitoring stopped")); return }
+        guard session.historical else { onError?(String(localized: "Log stopped")); return }
         let merged = (historicalEntries + buffered).enumerated().sorted {
             if $0.element.timestamp != $1.element.timestamp { return $0.element.timestamp < $1.element.timestamp }
             if $0.element.machTimestamp != $1.element.machTimestamp { return $0.element.machTimestamp < $1.element.machTimestamp }

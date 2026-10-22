@@ -3,7 +3,7 @@ import AppKit
 @MainActor
 final class MenuInfoView: NSView {
     private let heading = NSTextField(labelWithString: String(localized: "Reading output device…"))
-    private let format = NSTextField(labelWithString: String(localized: "Waiting for playback…"))
+    private let format = NSTextField(labelWithString: String(localized: "Waiting…"))
     private var lastPlayback: MusicPlayback?
     private var lastDeviceName: String?
     private var lastMessage: String?
@@ -34,7 +34,6 @@ final class MenuInfoView: NSView {
         lastMessage = message
         MusicDiagnostics.log("MENU_RENDER", "state=\(playback.state); device=\(deviceName ?? "unknown"); format=\(MusicDiagnostics.describe(playback.format)); message=\(message ?? "none")")
         heading.stringValue = deviceName ?? String(localized: "Device name unavailable")
-        heading.toolTip = heading.stringValue
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
         paragraph.lineBreakMode = .byTruncatingTail
@@ -49,10 +48,10 @@ final class MenuInfoView: NSView {
             format.attributedStringValue = text
         } else {
             let placeholder: String = switch playback.state {
-            case .unknown: String(localized: "Waiting for playback…")
-            case .playing: String(localized: "Waiting for audio format…")
+            case .unknown: String(localized: "Waiting…")
+            case .playing: String(localized: "Detecting…")
             case .paused: String(localized: "Paused")
-            case .stopped: String(localized: "Ready to play")
+            case .stopped: String(localized: "Ready")
             }
             format.attributedStringValue = NSAttributedString(
                 string: message ?? placeholder,
@@ -60,6 +59,5 @@ final class MenuInfoView: NSView {
                              .foregroundColor: NSColor.secondaryLabelColor,
                              .paragraphStyle: paragraph])
         }
-        format.toolTip = message ?? (playback.state == .paused ? String(localized: "Paused") : nil)
     }
 }

@@ -20,7 +20,7 @@ final class AudioOutput {
         do {
             device = try read(AudioObjectID(kAudioObjectSystemObject), Self.defaultDeviceAddress)
         } catch {
-            MusicDiagnostics.log("OUTPUT_NAME_FAILED", "Default device ID: \(error.localizedDescription)")
+            MusicDiagnostics.log("OUTPUT_NAME_FAILED", "Default device ID: \(error)")
             return nil
         }
         guard device != kAudioObjectUnknown else { return nil }
@@ -89,7 +89,7 @@ final class AudioOutput {
                     available.append(AudioOutputDevice(id: device, name: name, isCurrent: device == current))
                 } catch {
                     // A device can disappear while the system's device list is being read.
-                    MusicDiagnostics.log("OUTPUT_DEVICE_SKIPPED", "device=\(device); \(error.localizedDescription)")
+                    MusicDiagnostics.log("OUTPUT_DEVICE_SKIPPED", "device=\(device); \(error)")
                 }
             }
             devices = available.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
@@ -98,7 +98,7 @@ final class AudioOutput {
         } catch {
             devices = []
             devicesError = error.localizedDescription
-            MusicDiagnostics.log("OUTPUT_DEVICES_FAILED", error.localizedDescription)
+            MusicDiagnostics.log("OUTPUT_DEVICES_FAILED", String(describing: error))
         }
     }
 
@@ -248,11 +248,11 @@ private enum OutputError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .noDevice: String(localized: "No output device available")
-        case .unsupported: String(localized: "The output device does not support this lossless format")
-        case .readOnly: String(localized: "The output device format cannot be changed")
-        case .verification: String(localized: "Could not verify the output device format")
-        case .coreAudio(let status): String(localized: "Could not configure the output device (\(status))", comment: "The number is a Core Audio error code.")
+        case .noDevice: String(localized: "No device")
+        case .unsupported: String(localized: "Unsupported")
+        case .readOnly: String(localized: "Read-only")
+        case .verification: String(localized: "Unverified")
+        case .coreAudio: String(localized: "Setup failed")
         }
     }
 }

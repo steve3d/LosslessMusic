@@ -4,7 +4,7 @@ import Combine
 @MainActor
 final class MusicController: ObservableObject {
     @Published private(set) var playback = MusicPlayback()
-    @Published private(set) var message: String? = String(localized: "Reading Music logs…")
+    @Published private(set) var message: String? = String(localized: "Loading…")
     @Published private(set) var appliedFormat: LosslessFormat?
 
     var outputDeviceName: String? { output.deviceName }
@@ -16,7 +16,7 @@ final class MusicController: ObservableObject {
             try output.selectDevice(device.id)
         } catch {
             message = error.localizedDescription
-            MusicDiagnostics.log("OUTPUT_SELECT_FAILED", "device=\(device.id); \(error.localizedDescription)")
+            MusicDiagnostics.log("OUTPUT_SELECT_FAILED", "device=\(device.id); \(error)")
         }
     }
 
@@ -93,10 +93,10 @@ final class MusicController: ObservableObject {
         appliedFormat = nil
         guard let pid else {
             playback.state = .stopped
-            message = String(localized: "Music is not running")
+            message = String(localized: "Not running")
             return
         }
-        message = String(localized: "Reading Music logs…")
+        message = String(localized: "Loading…")
         monitor.start(processID: pid)
     }
 
@@ -115,7 +115,7 @@ final class MusicController: ObservableObject {
         let request = playback
         lastRequest = request
         MusicDiagnostics.log("SWITCH_REQUEST", "item=\(request.item ?? "nil") revision=\(request.revision) target=\(MusicDiagnostics.describe(format))")
-        message = String(localized: "Adjusting output format…")
+        message = String(localized: "Switching…")
         switchTask = Task { [weak self] in
             guard let self else { return }
             do {
@@ -130,7 +130,7 @@ final class MusicController: ObservableObject {
                 // A new item, pause, or output device now owns the pending work.
             } catch {
                 guard !Task.isCancelled, self.playback == request else { return }
-                MusicDiagnostics.log("SWITCH_FAILED", "item=\(request.item ?? "nil") revision=\(request.revision) error=\(error.localizedDescription)")
+                MusicDiagnostics.log("SWITCH_FAILED", "item=\(request.item ?? "nil") revision=\(request.revision) error=\(error)")
                 self.message = error.localizedDescription
             }
         }
